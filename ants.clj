@@ -66,7 +66,7 @@
     (dotimes [i food-places]
       (let [p (place [(rand-int dim) (rand-int dim)])]
         (alter p assoc :food (rand-int food-range))
-        (when (< 0 (+ -5 (rand-int 100))) ;5% of the time, make the food poisonous
+        (when (neg? (+ -10 (rand-int 100))) ;5% of the time, make the food poisonous
           (alter p assoc :poison 1))))
     (doall
      (for [x home-range y home-range]
@@ -261,9 +261,13 @@
   (when (pos? (:pher p))
     (fill-cell g x y (new Color 0 255 0 
                           (int (min 255 (* 255 (/ (:pher p) pher-scale)))))))
+
   (when (pos? (:food p))
-    (fill-cell g x y (new Color 255 0 0 
-                          (int (min 255 (* 255 (/ (:food p) food-scale)))))))
+    (cond 
+      (pos? (:poison p)) (fill-cell g x y (new Color 0 255 0 255))
+      :else (fill-cell g x y (new Color 255 0 0 
+                                          (int (min 255 (* 255 (/ (:food p) food-scale))))))))
+
   (when (:ant p)
     (render-ant (:ant p) g x y)))
 
