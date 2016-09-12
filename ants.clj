@@ -15,6 +15,8 @@
 (def food-places 35)
 ;range of amount of food at a place
 (def food-range 100)
+;poison food rate in percent
+(def poison-food-rate 5)
 ;scale factor for pheromone drawing
 (def pher-scale 20.0)
 ;scale factor for food drawing
@@ -28,13 +30,15 @@
 
 (def running true)
 
-(defstruct cell :food :pher) ;may also have :ant and :home
+
+(defstruct cell :food :pher :poison) ;may also have :ant and :home
+;poison is boolean. idicates the food at the cell is poisonous
 
 ;world is a 2d vector of refs to cells
 (def world 
      (apply vector 
             (map (fn [_] 
-                   (apply vector (map (fn [_] (ref (struct cell 0 0))) 
+                   (apply vector (map (fn [_] (ref (struct cell 0 0 0))) 
                                       (range dim)))) 
                  (range dim))))
 
@@ -61,7 +65,8 @@
   (sync nil
     (dotimes [i food-places]
       (let [p (place [(rand-int dim) (rand-int dim)])]
-        (alter p assoc :food (rand-int food-range))))
+        (alter p assoc :food (rand-int food-range))
+        (alter p assoc :poison 1)))
     (doall
      (for [x home-range y home-range]
        (do
