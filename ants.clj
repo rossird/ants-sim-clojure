@@ -66,7 +66,8 @@
     (dotimes [i food-places]
       (let [p (place [(rand-int dim) (rand-int dim)])]
         (alter p assoc :food (rand-int food-range))
-        (alter p assoc :poison 1)))
+        (when (< 0 (+ -5 (rand-int 100))) ;5% of the time, make the food poisonous
+          (alter p assoc :poison 1))))
     (doall
      (for [x home-range y home-range]
        (do
