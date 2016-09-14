@@ -148,10 +148,15 @@
   "Takes one food from current location. Must be called in a
   transaction that has verified there is food available"
   (let [p (place loc)
-        ant (:ant @p)]    
+        ant (:ant @p)
+        poison (:poison @p)]
+    ;if ant eats poison, it dies
     (alter p assoc 
            :food (dec (:food @p))
            :ant (assoc ant :food true))
+    (cond
+    	(pos? poison) (alter p dissoc :ant))
+    
     loc))
 
 (defn drop-food [loc]
@@ -259,12 +264,13 @@
 
 (defn render-place [g p x y]
   (when (pos? (:pher p))
-    (fill-cell g x y (new Color 0 255 0 
+    (fill-cell g x y (new Color 0 125 125 
                           (int (min 255 (* 255 (/ (:pher p) pher-scale)))))))
 
   (when (pos? (:food p))
     (cond 
-      (pos? (:poison p)) (fill-cell g x y (new Color 0 255 0 255))
+      (pos? (:poison p)) (fill-cell g x y (new Color 0 255 0 
+      									  (int (min 255 (* 255 (/ (:food p) food-scale))))))
       :else (fill-cell g x y (new Color 255 0 0 
                                           (int (min 255 (* 255 (/ (:food p) food-scale))))))))
 
